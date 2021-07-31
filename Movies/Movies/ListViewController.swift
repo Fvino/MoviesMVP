@@ -86,17 +86,18 @@ final class ListViewController: UIViewController {
     }
 
     private func fetchData() {
-        guard let url = URL(string: jsonUrlString) else {
-            return
-        }
+        guard let url = URL(string: jsonUrlString) else { return }
         URLSession.shared.dataTask(with: url) { data, _, _ in
             guard let data = data else { return }
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 self.category = try decoder.decode(Category.self, from: data)
+
+                weak var weakSelf = self
                 DispatchQueue.main.async {
-                    self.filmTableView.reloadData()
+                    guard weakSelf == self else { return }
+                    weakSelf?.filmTableView.reloadData()
                 }
             } catch {
                 print("error")
@@ -104,13 +105,9 @@ final class ListViewController: UIViewController {
         }.resume()
     }
 
-    private func configureCell(cell: ListTableViewCell, for indexPath: IndexPath) {
-        let filmTitle = category?.results[indexPath.row].title
-        let filmOverview = category?.results[indexPath.row].overview
-        let filmImage = category?.results[indexPath.row].posterPath
-
-        cell.filmLable.text = filmTitle
-        cell.filmDescription.text = filmOverview
+    func configureCell(cell: ListTableViewCell, for indexPath: IndexPath) {
+        guard let result = category?.results[indexPath.row] else { return }
+        let filmImage = result.posterPath
 
         DispatchQueue.global().async {
             let const = "https://image.tmdb.org/t/p/w500"
@@ -118,7 +115,8 @@ final class ListViewController: UIViewController {
             guard let imageData = try? Data(contentsOf: urlImage) else { return }
 
             DispatchQueue.main.async {
-                cell.filmImage.image = UIImage(data: imageData)
+                guard let image = UIImage(data: imageData) else { return }
+                cell.configCell(films: result, image: image)
             }
         }
     }

@@ -5,16 +5,18 @@ import UIKit
 
 /// ListTableViewCell
 final class ListTableViewCell: UITableViewCell {
-    // MARK: - Private Properties
-
-    private let filmView = UIView()
-
     // MARK: - Properties
 
     static let identifier = "ListTableViewCell"
-    let filmImage = UIImageView()
-    let filmLable = UILabel()
-    let filmDescription = UILabel()
+
+    // MARK: - Private Properties
+
+    private let filmView = UIView()
+    private let filmImage = UIImageView()
+    private let filmLable = UILabel()
+    private let filmDescription = UILabel()
+
+    // MARK: - UITableViewCell
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -24,6 +26,14 @@ final class ListTableViewCell: UITableViewCell {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+    }
+
+    // MARK: - Methods
+
+    func configCell(films: Films, image: UIImage) {
+        filmImage.image = image
+        filmLable.text = films.title
+        filmDescription.text = films.overview
     }
 
     // MARK: - Private Methods

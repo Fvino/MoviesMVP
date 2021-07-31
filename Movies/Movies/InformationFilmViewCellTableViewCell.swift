@@ -8,20 +8,23 @@ final class InformationFilmViewCellTableViewCell: UITableViewCell {
 
     static let identifier = "InfoTableViewCell"
 
-    let imageFilm = UIImageView()
-    let filmDeascription = UILabel()
+    // MARK: - Private Properties
+
+    private let imageFilm = UIImageView()
+    private let filmDeascription = UILabel()
+
+    // MARK: - UITableViewCell
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-    }
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
         createVisualElements()
     }
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
+    // MARK: - Methods
+
+    func configCell(films: Films, image: UIImage) {
+        imageFilm.image = image
+        filmDeascription.text = films.overview
     }
 
     // MARK: - Private Methods
@@ -39,15 +42,16 @@ final class InformationFilmViewCellTableViewCell: UITableViewCell {
     }
 
     private func createFilmDescription() {
-        filmDeascription.numberOfLines = 30
+        filmDeascription.numberOfLines = 0
         addSubview(filmDeascription)
 
         filmDeascription.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             filmDeascription.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 65),
-            filmDeascription.topAnchor.constraint(equalTo: imageFilm.bottomAnchor, constant: 50),
+            filmDeascription.topAnchor.constraint(equalTo: imageFilm.bottomAnchor, constant: 10),
             filmDeascription.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -50),
-            filmDeascription.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200)
+            filmDeascription.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
+            filmDeascription.heightAnchor.constraint(equalToConstant: 300)
         ])
     }
 

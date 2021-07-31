@@ -13,8 +13,5 @@ struct Films: Decodable {
 
 /// Struct Category
 struct Category: Decodable {
-//    let page: Int
-//    let totalPages: Int
-//    let totalResults: Int
     let results: [Films]
 }

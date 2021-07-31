@@ -4,17 +4,17 @@
 import UIKit
 /// InformationFilmViewController
 final class InformationFilmViewController: UIViewController {
+    // MARK: - Properties
+
+    var idFilm = Int()
+    var infoCategory: Films?
+
     // MARK: - Private Properties
 
     private var infoTableView = UITableView()
     private let identifire = "MyCell"
-
-    // MARK: - Properties
-
-    var infoImage = UIImageView()
-    var infoLable = UILabel()
-    var idFilm = Int()
-    var infoCategory: Films?
+    private var infoImage = UIImageView()
+    private var infoLable = UILabel()
 
     // MARK: UIViewController
 
@@ -51,9 +51,7 @@ final class InformationFilmViewController: UIViewController {
     private func fetchData() {
         let jsonUrlString =
             "https://api.themoviedb.org/3/movie/\(idFilm)?api_key=d21445c991b862f2b5da36887c777ba4&language=ru-RU&page=1"
-        guard let url = URL(string: jsonUrlString) else {
-            return
-        }
+        guard let url = URL(string: jsonUrlString) else { return }
         URLSession.shared.dataTask(with: url) { data, _, _ in
 
             guard let data = data else { return }
@@ -63,8 +61,10 @@ final class InformationFilmViewController: UIViewController {
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 self.infoCategory = try decoder.decode(Films.self, from: data)
 
+                weak var weakSelf = self
                 DispatchQueue.main.async {
-                    self.infoTableView.reloadData()
+                    guard weakSelf == self else { return }
+                    weakSelf?.infoTableView.reloadData()
                 }
             } catch {
                 print("error")
@@ -73,18 +73,15 @@ final class InformationFilmViewController: UIViewController {
     }
 
     private func configureCell(cell: InformationFilmViewCellTableViewCell, for indexPath: IndexPath) {
-        let filmOverview = infoCategory?.overview
-        let filmImage = infoCategory?.posterPath
-
-        cell.filmDeascription.text = filmOverview
-
+        guard let result = infoCategory, let filmImage = infoCategory?.posterPath else { return }
         DispatchQueue.global().async {
             let const = "https://image.tmdb.org/t/p/w500"
-            guard let urlImage = URL(string: "\(const)\(filmImage ?? "")") else { return }
+            guard let urlImage = URL(string: "\(const)\(filmImage)") else { return }
             guard let imageData = try? Data(contentsOf: urlImage) else { return }
 
             DispatchQueue.main.async {
-                cell.imageFilm.image = UIImage(data: imageData)
+                guard let image = UIImage(data: imageData) else { return }
+                cell.configCell(films: result, image: image)
             }
         }
     }
