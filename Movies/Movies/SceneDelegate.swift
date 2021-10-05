@@ -13,8 +13,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
-        let listViewController = ListViewController()
-        navController = UINavigationController(rootViewController: listViewController)
+//        let listViewController = ListViewController()
+        let moviePresenter = MoviePresenter()
+        let listVC = ListViewController()
+        moviePresenter.presenterSetUp(listView: listVC)
+        listVC.presenter = moviePresenter
+        navController = UINavigationController(rootViewController: listVC)
 
         window?.rootViewController = navController
         window?.backgroundColor = UIColor.white

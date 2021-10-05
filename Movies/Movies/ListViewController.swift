@@ -10,20 +10,17 @@ final class ListViewController: UIViewController {
     private var genresSegmentControl = UISegmentedControl()
     private let identifire = "MyCell"
     private var genresArray = ["Popular", "Top Rated", "Up Coming"]
-    private var jsonUrlString =
-        "https://api.themoviedb.org/3/movie/popular?api_key=d21445c991b862f2b5da36887c777ba4&language=ru-RU&page=1"
-    private var category: Category?
+
+    var presenter: MovieViewPresenterProtocol!
 
     // MARK: - UIViewController
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.title = "Popular"
-
         createSegmentControl()
+        presenter.fetchData()
         createTable()
-        fetchData()
     }
 
     // MARK: - Private Methods
@@ -66,47 +63,13 @@ final class ListViewController: UIViewController {
     }
 
     @objc private func selectGendersSegmentControl() {
-        switch genresSegmentControl.selectedSegmentIndex {
-        case 0:
-            jsonUrlString =
-                "https://api.themoviedb.org/3/movie/popular?api_key=d21445c991b862f2b5da36887c777ba4&language=ru-RU&page=1"
-            navigationItem.title = "Popular"
-        case 1:
-            jsonUrlString =
-                "https://api.themoviedb.org/3/movie/top_rated?api_key=d21445c991b862f2b5da36887c777ba4&language=ru-Ru&page=1"
-            navigationItem.title = "Top Rated"
-        case 2:
-            jsonUrlString =
-                "https://api.themoviedb.org/3/movie/upcoming?api_key=d21445c991b862f2b5da36887c777ba4&language=ru-Ru&page=1"
-            navigationItem.title = "Up Coming"
-        default:
-            break
-        }
-        fetchData()
-    }
+        presenter.selectCategory(index: genresSegmentControl.selectedSegmentIndex)
 
-    private func fetchData() {
-        guard let url = URL(string: jsonUrlString) else { return }
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            guard let data = data else { return }
-            do {
-                let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
-                self.category = try decoder.decode(Category.self, from: data)
-
-                weak var weakSelf = self
-                DispatchQueue.main.async {
-                    guard weakSelf == self else { return }
-                    weakSelf?.filmTableView.reloadData()
-                }
-            } catch {
-                print("error")
-            }
-        }.resume()
+        presenter.fetchData()
     }
 
     func configureCell(cell: ListTableViewCell, for indexPath: IndexPath) {
-        guard let result = category?.results[indexPath.row] else { return }
+        guard let result = presenter.category?.results[indexPath.row] else { return }
         let filmImage = result.posterPath
 
         DispatchQueue.global().async {
@@ -139,17 +102,27 @@ extension ListViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let countRow = category?.results.count else { return Int() }
+        guard let countRow = presenter.category?.results.count else { return Int() }
         return countRow
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let category = category?.results[indexPath.row] else { return }
+        guard let category = presenter.category?.results[indexPath.row] else { return }
 
         let informationFilmVC = InformationFilmViewController()
 
         informationFilmVC.idFilm = category.id
         informationFilmVC.infoCategory = category
         navigationController?.pushViewController(informationFilmVC, animated: true)
+    }
+}
+
+// MARK: - MovieViewProtocol
+
+extension ListViewController: MovieViewProtocol {
+    func reloadData() {
+        DispatchQueue.main.async {
+            self.filmTableView.reloadData()
+        }
     }
 }
