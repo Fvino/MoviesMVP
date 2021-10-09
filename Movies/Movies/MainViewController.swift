@@ -2,8 +2,8 @@
 // Copyright © RoadMap. All rights reserved.
 
 import UIKit
-/// LIstViewController
-final class ListViewController: UIViewController {
+/// MainViewController
+final class MainViewController: UIViewController {
     // MARK: - Private Properties
 
     private var filmTableView = UITableView()
@@ -87,11 +87,11 @@ final class ListViewController: UIViewController {
 
 // MARK: - UITableViewDelegate
 
-extension ListViewController: UITableViewDelegate {}
+extension MainViewController: UITableViewDelegate {}
 
 // MARK: - UITableViewDataSource
 
-extension ListViewController: UITableViewDataSource {
+extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView
             .dequeueReusableCell(withIdentifier: identifire, for: indexPath) as? ListTableViewCell
@@ -119,7 +119,7 @@ extension ListViewController: UITableViewDataSource {
 
 // MARK: - MovieViewProtocol
 
-extension ListViewController: MovieViewProtocol {
+extension MainViewController: MovieViewProtocol {
     func reloadData() {
         DispatchQueue.main.async {
             self.filmTableView.reloadData()

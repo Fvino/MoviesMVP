@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
 //        let listViewController = ListViewController()
         let moviePresenter = MoviePresenter()
-        let listVC = ListViewController()
+        let listVC = MainViewController()
         moviePresenter.presenterSetUp(listView: listVC)
         listVC.presenter = moviePresenter
         navController = UINavigationController(rootViewController: listVC)
